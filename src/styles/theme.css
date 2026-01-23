@@ -1,0 +1,100 @@
+/* CSS Variable Theme Tokens (light + dark) */
+/* Keep ONLY variables here; structural styles go elsewhere */
+
+:root {
+  /* Palette */
+  --color-bg: #ffffff;
+  --color-bg-alt: #f5f7fa;
+  --color-surface: #ffffff;
+  --color-border: #d0d7de;
+  --color-text: #111827;
+  --color-text-muted: #5f6b7a;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-danger: #dc2626;
+  --color-focus-ring: 0 0 0 3px rgba(37, 99, 235, 0.4);
+
+  /* Elevation */
+  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+
+  /* Typography */
+  --font-sans: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+
+  /* Sizing & Layout */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-full: 999px;
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --transition-fast: 120ms cubic-bezier(.4,0,.2,1);
+
+  /* Welcome / hero gradient (can vary by theme) */
+  --welcome-start: #111827;
+  --welcome-end: #5a5a5a;
+  --chip-bg: #111;
+  --chip-border: #1f1f1f;
+  --chip-color: #b5b5b5;
+  /* Neon accent (cyan -> pink) for branding */
+  --neon-start: #00e5ff;
+  --neon-end: #ff4da6;
+
+  /* Composer / input surface tokens */
+  --composer-backdrop: linear-gradient(to top, rgba(0,0,0,.06), rgba(0,0,0,0));
+  --composer-surface-bg: #ffffff;
+  --composer-surface-border: #e6e9ee;
+  --composer-surface-focus-bg: #ffffff;
+  --composer-text: var(--color-text);
+  --composer-placeholder: #6b7280;
+  --send-btn-bg: #eef2ff;
+  --send-btn-border: #c7d2fe;
+  --send-btn-color: var(--color-primary);
+  --send-btn-hover-filter: brightness(0.95);
+}
+
+/* Dark Theme (system preference) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #0f172a;
+    --color-bg-alt: #1e293b;
+    --color-surface: #1e293b;
+    --color-border: #334155;
+    --color-text: #f1f5f9;
+    --color-text-muted: #94a3b8;
+    --color-primary: #3b82f6;
+    --color-primary-hover: #2563eb;
+    --color-danger: #f87171;
+    --color-focus-ring: 0 0 0 3px rgba(59,130,246,0.45);
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.6);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.7), 0 1px 2px rgba(0,0,0,0.5);
+    --welcome-start: #fafafa;
+    --welcome-end: #9ca3af;
+    --chip-bg: #0d0d0d;
+    --chip-border: #1f1f1f;
+    --chip-color: #b5b5b5;
+    --neon-start: #6ef0ff;
+    --neon-end: #ff7acb;
+    /* Dark composer tokens */
+    --composer-backdrop: linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,0));
+    --composer-surface-bg: #1f1f20;
+    --composer-surface-border: #3a3a3c;
+    --composer-surface-focus-bg: #232324;
+    --composer-text: #f5f5f5;
+    --composer-placeholder: #8d8d91;
+    --send-btn-bg: #3a3a3c;
+    --send-btn-border: #525255;
+    --send-btn-color: #f1f1f2;
+    --send-btn-hover-filter: none;
+  }
+}
