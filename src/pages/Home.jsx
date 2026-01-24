@@ -1,17 +1,19 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../components/chat/ChatLayout.css";
 import "./Home.css";
 
 const Home = () => {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="chat-layout minimal home-page">
       <header className="site-nav">
         <div className="nav-left">
-          <a className="brand" href="/">
+          <button type="button" className="brand" onClick={() => navigate('/')}>
             Vera‑AI
-          </a>
+          </button>
           <div className="brand-meaning">
             — A truthful
             assistant
@@ -19,35 +21,15 @@ const Home = () => {
         </div>
 
         <div className="nav-right">
-          <nav className="nav-links" aria-hidden={open ? "false" : "true"}>
-            <a className="link" href="/login">
+          <nav className="nav-links" >
+            <button type="button" className="link" onClick={() => navigate('/login')}>
               Sign In
-            </a>
+            </button>
           </nav>
-          <a className="primary-btn cta-btn" href="/register">
-            Get Started
-          </a>
-
-          <button
-            className="menu-toggle"
-            aria-label="Toggle menu"
-            onClick={() => setOpen((v) => !v)}
-          >
-            ☰
-          </button>
+       
         </div>
 
-        {open && (
-          <div className="mobile-menu">
-            <a className="mobile-link" href="/login">
-              Sign In
-            </a>
-
-            <a className="primary-btn mobile-cta" href="/register">
-              Get Started
-            </a>
-          </div>
-        )}
+        
       </header>
 
       <main className="chat-main home-hero" role="main">
@@ -60,12 +42,10 @@ const Home = () => {
             left off.
           </p>
           <div className="hero-ctas">
-            <a className="primary-btn" href="/register">
+            <button type="button" className="primary-btn" onClick={() => navigate('/register')}>
               Get Started
-            </a>
-            <a className="link" href="/login">
-              Sign In
-            </a>
+            </button>
+           
           </div>
         </div>
       </main>

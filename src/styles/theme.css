@@ -46,9 +46,7 @@
   --chip-bg: #111;
   --chip-border: #1f1f1f;
   --chip-color: #b5b5b5;
-  /* Neon accent (cyan -> pink) for branding */
-  --neon-start: #00e5ff;
-  --neon-end: #ff4da6;
+ 
 
   /* Composer / input surface tokens */
   --composer-backdrop: linear-gradient(to top, rgba(0,0,0,.06), rgba(0,0,0,0));
@@ -83,15 +81,14 @@
     --chip-bg: #0d0d0d;
     --chip-border: #1f1f1f;
     --chip-color: #b5b5b5;
-    --neon-start: #6ef0ff;
-    --neon-end: #ff7acb;
+   
     /* Dark composer tokens */
     --composer-backdrop: linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,0));
     --composer-surface-bg: #1f1f20;
     --composer-surface-border: #3a3a3c;
     --composer-surface-focus-bg: #232324;
     --composer-text: #f5f5f5;
-    --composer-placeholder: #8d8d91;
+    --composer-placeholder: #f5f5f5;
     --send-btn-bg: #3a3a3c;
     --send-btn-border: #525255;
     --send-btn-color: #f1f1f2;
