@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "../api/axios";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -14,8 +15,17 @@ const Login = () => {
   async function handleSubmit(e) {
     e.preventDefault();
     setSubmitting(true);
-
-    console.log(form);
+    try {
+      const response = await axios.post(
+        "/auth/login",
+        { email: form.email, password: form.password },
+        { withCredentials: true },
+      );
+      navigate("/chat");
+    } catch (error) {
+      console.error("Login failed:", error);
+      setSubmitting(false);
+    }
   }
 
   return (
