@@ -1,5 +1,8 @@
 import React from "react";
 import "./ChatSidebar.css";
+import ConfirmModal from "../ui/ConfirmModal";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ChatSidebar = ({
   chats,
@@ -8,6 +11,28 @@ const ChatSidebar = ({
   onNewChat,
   open,
 }) => {
+  const navigate = useNavigate();
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
+  const doLogout = () => {
+    try {
+      // Clear all cookies for current domain (best-effort)
+      document.cookie.split(";").forEach(function (c) {
+        const name = c.split("=")[0].trim();
+        document.cookie = name + "=; Max-Age=0; path=/";
+        document.cookie =
+          name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+      });
+    } catch (e) {}
+    try {
+      localStorage.clear();
+    } catch (e) {}
+    try {
+      sessionStorage.clear();
+    } catch (e) {}
+    navigate("/login");
+  };
+
   return (
     <aside
       className={"chat-sidebar " + (open ? "open" : "")}
@@ -36,6 +61,23 @@ const ChatSidebar = ({
         ))}
         {chats.length === 0 && <p className="empty-hint">No chats yet.</p>}
       </nav>
+      <div className="sidebar-footer">
+        <button className="logout-btn" onClick={() => setConfirmOpen(true)}>
+          Log out
+        </button>
+      </div>
+      <ConfirmModal
+        open={confirmOpen}
+        title="Log out"
+        message="Are you sure you want to log out?"
+        cancelLabel="Cancel"
+        confirmLabel="Log out"
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          doLogout();
+        }}
+      />
     </aside>
   );
 };

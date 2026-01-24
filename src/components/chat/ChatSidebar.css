@@ -19,3 +19,8 @@
 /* Sidebar backdrop */
 .sidebar-backdrop { position:fixed; inset:0; background: rgba(0,0,0,0.35); border:none; padding:0; margin:0; cursor:pointer; z-index:35; }
 @media (min-width:960px) { .sidebar-backdrop { display:none; } }
+
+/* Footer / logout */
+.sidebar-footer { margin-top: auto; padding: var(--space-4); }
+.logout-btn { width:100%; background: #dc2626; color: #fff; border: none; padding: 10px 12px; border-radius: 8px; font-weight:600; cursor:pointer; }
+.logout-btn:hover { filter: brightness(.95); }
