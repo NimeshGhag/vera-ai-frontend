@@ -25,10 +25,23 @@
 .chat-layout.minimal .msg-error .msg-bubble { border-color: var(--color-danger); color: var(--color-danger); }
 /* Welcome (empty state) */
 .chat-welcome { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; pointer-events:none; text-align:center; }
-.chat-welcome h1 { font-size:2.75rem; font-weight:600; letter-spacing:-0.02em; margin:0; background:linear-gradient(90deg, var(--neon-start), var(--neon-end)); -webkit-background-clip:text; background-clip:text; color:transparent; }
-.chat-welcome-title { font-size:2.75rem; font-weight:600; letter-spacing:-0.02em; margin:0; background:linear-gradient(90deg, var(--neon-start), var(--neon-end)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+
+.chat-welcome h1 { 
+    font-size:2.75rem; font-weight:600; letter-spacing:-0.02em; margin:0; background:linear-gradient(90deg, var( --welcome-start), var(--welcome-end)); -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+
+.chat-welcome-title { font-size:2.75rem; font-weight:600; letter-spacing:-0.02em; margin:0; background:linear-gradient(90deg, var(--welcome-start), var(--welcome-end)); -webkit-background-clip:text; background-clip:text; color:transparent; }
+
 .chat-welcome p { margin:0; font-size:0.95rem; color: var(--color-text-muted); max-width:420px; line-height:1.4; }
-.chat-welcome .chip { background: var(--chip-bg); border:1px solid var(--chip-border); padding:6px 14px; border-radius:999px; font-size:0.75rem; font-weight:500; color: var(--chip-color); }
+
+.chat-welcome .chip { 
+    background: var(--chip-bg); 
+    border:1px solid var(--chip-border); 
+    padding:6px 14px; border-radius:999px;
+     font-size:0.75rem; font-weight:500;
+      color: var(--chip-color); 
+}
+
 /* Scrollbar minimal styling (webkit) */
 .chat-layout.minimal .messages::-webkit-scrollbar { width:10px; }
 .chat-layout.minimal .messages::-webkit-scrollbar-track { background: var(--color-bg); }
