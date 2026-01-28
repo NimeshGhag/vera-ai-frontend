@@ -12,6 +12,7 @@ import {
   addMessage,
   setCurrentChat,
   setLoading,
+  setChats,
 } from "../redux/slices/chatSlice";
 import {
   selectChats,
@@ -20,7 +21,6 @@ import {
   selectCurrentChatMessages,
 } from "../redux/selectors/chatSelectors";
 import axios from "../api/axios";
-
 
 const Chat = () => {
   const dispatch = useDispatch();
@@ -39,19 +39,17 @@ const Chat = () => {
 
   // Initialize with first chat if none exists
   useEffect(() => {
-    if (chats.length === 0) {
-      // dispatch(addChat("New Chat"));
-    } else if (!activeChatId) {
-      dispatch(setCurrentChat(chats[0].id));
-    }
-  }, [chats.length, activeChatId, dispatch]);
+    const response = axios.get("/chat/", { withCredentials: true }).then((response) => {
+      dispatch(setChats(response.data));
+    });
+  }, [dispatch]);
 
   const startNewChat = useCallback(() => {
     setShowNewChatModal(true);
   }, []);
 
   const handleCreateChat = useCallback(
-    async(chatTitle) => {
+    async (chatTitle) => {
       const response = await axios.post(
         "/chat/",
         { title: chatTitle },

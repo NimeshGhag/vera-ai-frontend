@@ -47,15 +47,16 @@ const ChatSidebar = ({
       <nav className="chat-list" aria-live="polite">
         {chats.map((c) => (
           <button
-            key={c.id}
+            key={c._id}
             className={
-              "chat-list-item " + (c.id === activeChatId ? "active" : "")
+              "chat-list-item " + (c._id === activeChatId ? "active" : "")
             }
-            onClick={() => onSelectChat(c.id)}
+            onClick={() => onSelectChat(c._id)}
           >
             <span className="title-line">{c.title}</span>
             <span className="meta-line">
-              {c.messages.length} msg{c.messages.length !== 1 && "s"}
+              {c.messages?.length ?? 0} msg
+              {(c.messages?.length ?? 0) !== 1 && "s"}
             </span>
           </button>
         ))}

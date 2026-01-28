@@ -17,12 +17,24 @@ const chatSlice = createSlice({
     addChat: (state, action) => {
       const newChat = {
         id: uid(),
-        title: action.payload || "New Chat",
+        title: action.payload,
         messages: [],
         createdAt: Date.now(),
       };
       state.chats.unshift(newChat);
       state.currentChatId = newChat.id;
+    },
+    // Set all chats
+    setChats(state, action) {
+      // Handle cases where payload might be an object with chats property or directly an array
+      const chats = Array.isArray(action.payload)
+        ? action.payload
+        : action.payload?.chats || [];
+      // Ensure each chat has a messages property
+      state.chats = chats.map((chat) => ({
+        ...chat,
+        messages: chat.messages || [],
+      }));
     },
 
     // Set the currently active chat
@@ -92,6 +104,7 @@ const chatSlice = createSlice({
 });
 
 export const {
+  setChats,
   addChat,
   setCurrentChat,
   addMessage,
