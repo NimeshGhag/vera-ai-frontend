@@ -1,74 +1,109 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import ChatMobileBar from '../components/chat/ChatMobileBar.jsx';
-import ChatSidebar from '../components/chat/ChatSidebar.jsx';
-import ChatMessages from '../components/chat/ChatMessages.jsx';
-import ChatComposer from '../components/chat/ChatComposer.jsx';
-import '../components/chat/ChatLayout.css';
-import { fakeAIReply } from '../components/chat/aiClient.js';
+import React, { useCallback, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import ChatMobileBar from "../components/chat/ChatMobileBar.jsx";
+import ChatSidebar from "../components/chat/ChatSidebar.jsx";
+import ChatMessages from "../components/chat/ChatMessages.jsx";
+import ChatComposer from "../components/chat/ChatComposer.jsx";
+import NewChatModal from "../components/ui/NewChatModal.jsx";
+import "../components/chat/ChatLayout.css";
+import { fakeAIReply } from "../components/chat/aiClient.js";
+import {
+  addChat,
+  addMessage,
+  setCurrentChat,
+  setLoading,
+} from "../redux/slices/chatSlice";
+import {
+  selectChats,
+  selectCurrentChatId,
+  selectCurrentChat,
+  selectCurrentChatMessages,
+} from "../redux/selectors/chatSelectors";
+import axios from "../api/axios";
 
-const uid = () => Math.random().toString(36).slice(2, 11);
 
 const Chat = () => {
-  // Previous chats list
-  const [chats, setChats] = useState([]); // [{id, title, messages:[{id, role, content, ts}]}]
-  const [activeChatId, setActiveChatId] = useState(null);
-  const [input, setInput] = useState('');
-  const [isSending, setIsSending] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false); // mobile off-canvas
+  const dispatch = useDispatch();
 
-  const activeChat = chats.find(c => c.id === activeChatId) || null;
-  const messages = activeChat ? activeChat.messages : [];
+  // Redux state
+  const chats = useSelector(selectChats);
+  const activeChatId = useSelector(selectCurrentChatId);
+  const activeChat = useSelector(selectCurrentChat);
+  const messages = useSelector(selectCurrentChatMessages);
+
+  // Local state
+  const [input, setInput] = useState("");
+  const [isSending, setIsSending] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showNewChatModal, setShowNewChatModal] = useState(false);
+
+  // Initialize with first chat if none exists
+  useEffect(() => {
+    if (chats.length === 0) {
+      // dispatch(addChat("New Chat"));
+    } else if (!activeChatId) {
+      dispatch(setCurrentChat(chats[0].id));
+    }
+  }, [chats.length, activeChatId, dispatch]);
 
   const startNewChat = useCallback(() => {
-    const id = uid();
-    const newChat = { id, title: 'New Chat', messages: [] };
-    setChats(prev => [newChat, ...prev]);
-    setActiveChatId(id);
-    setSidebarOpen(false);
+    setShowNewChatModal(true);
   }, []);
 
-  // Ensure at least one chat exists initially
-  useEffect(() => {
-    if (!activeChatId && chats.length === 0) startNewChat();
-  }, [activeChatId, chats.length, startNewChat]);
-
-  const updateChat = useCallback((chatId, updater) => {
-    setChats(prev => prev.map(c => (c.id === chatId ? updater(c) : c)));
-  }, []);
+  const handleCreateChat = useCallback(
+    async(chatTitle) => {
+      const response = await axios.post(
+        "/chat/",
+        { title: chatTitle },
+        { withCredentials: true },
+      );
+      dispatch(addChat(chatTitle));
+      setSidebarOpen(false);
+    },
+    [dispatch],
+  );
 
   const sendMessage = useCallback(async () => {
     const trimmed = input.trim();
     if (!trimmed || !activeChatId || isSending) return;
+
     setIsSending(true);
-    const userMsg = { id: uid(), role: 'user', content: trimmed, ts: Date.now() };
-    updateChat(activeChatId, c => ({
-      ...c,
-      title: c.messages.length === 0 ? trimmed.slice(0, 40) + (trimmed.length > 40 ? '…' : '') : c.title,
-      messages: [...c.messages, userMsg]
-    }));
-    setInput('');
+
+    // Add user message to Redux
+    dispatch(addMessage({ role: "user", content: trimmed }));
+    setInput("");
+
     try {
-      const reply = await fakeAIReply(trimmed);
-      const aiMsg = { id: uid(), role: 'ai', content: reply, ts: Date.now() };
-      updateChat(activeChatId, c => ({ ...c, messages: [...c.messages, aiMsg] }));
-  } catch {
-      const errMsg = { id: uid(), role: 'ai', content: 'Error fetching AI response.', ts: Date.now(), error: true };
-      updateChat(activeChatId, c => ({ ...c, messages: [...c.messages, errMsg] }));
+      // const reply = await fakeAIReply(trimmed);
+      // Add AI message to Redux
+      dispatch(addMessage({ role: "ai", content: reply }));
+    } catch {
+      // Add error message to Redux
+      dispatch(
+        addMessage({
+          role: "ai",
+          content: "Error fetching AI response.",
+          error: true,
+        }),
+      );
     } finally {
       setIsSending(false);
     }
-  }, [input, activeChatId, isSending, updateChat]);
+  }, [input, activeChatId, isSending, dispatch]);
 
   return (
-  <div className="chat-layout minimal">
+    <div className="chat-layout minimal">
       <ChatMobileBar
-        onToggleSidebar={() => setSidebarOpen(o => !o)}
+        onToggleSidebar={() => setSidebarOpen((o) => !o)}
         onNewChat={startNewChat}
       />
       <ChatSidebar
         chats={chats}
         activeChatId={activeChatId}
-        onSelectChat={(id) => { setActiveChatId(id); setSidebarOpen(false); }}
+        onSelectChat={(id) => {
+          dispatch(setCurrentChat(id));
+          setSidebarOpen(false);
+        }}
         onNewChat={startNewChat}
         open={sidebarOpen}
       />
@@ -77,14 +112,18 @@ const Chat = () => {
           <div className="chat-welcome" aria-hidden="true">
             <div className="chip">Early Preview</div>
             <h1>Vera-Ai</h1>
-            <p>Ask anything. Paste text, brainstorm ideas, or get quick explanations. Your chats stay in the sidebar so you can pick up where you left off.</p>
+            <p>
+              Ask anything. Paste text, brainstorm ideas, or get quick
+              explanations. Your chats stay in the sidebar so you can pick up
+              where you left off.
+            </p>
           </div>
         )}
         <ChatMessages messages={messages} isSending={isSending} />
         <ChatComposer
           input={input}
           setInput={setInput}
-            onSend={sendMessage}
+          onSend={sendMessage}
           isSending={isSending}
         />
       </main>
@@ -95,6 +134,11 @@ const Chat = () => {
           onClick={() => setSidebarOpen(false)}
         />
       )}
+      <NewChatModal
+        isOpen={showNewChatModal}
+        onClose={() => setShowNewChatModal(false)}
+        onCreateChat={handleCreateChat}
+      />
     </div>
   );
 };
