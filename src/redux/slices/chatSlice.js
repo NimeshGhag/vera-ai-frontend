@@ -32,7 +32,11 @@ const chatSlice = createSlice({
         : action.payload?.chats || [];
       // Ensure each chat has a messages property
       state.chats = chats.map((chat) => ({
+        // Normalize id field: prefer existing id, otherwise use _id from server
+        id: chat.id || chat._id || uid(),
+        // keep any other properties
         ...chat,
+        // ensure messages array exists
         messages: chat.messages || [],
       }));
     },

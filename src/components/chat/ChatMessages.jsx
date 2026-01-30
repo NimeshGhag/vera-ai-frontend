@@ -8,9 +8,9 @@ const ChatMessages = ({ messages, isSending }) => {
   }, [messages.length, isSending]);
   return (
     <div className="messages" aria-live="polite">
-      {messages.map((m) => (
+      {messages.map((m,index) => (
         <div
-          key={m.id}
+          key={index}
           className={`msg msg-${m.role}${m.error ? " msg-error" : ""}`}
         >
           <div className="msg-role" aria-hidden="true">

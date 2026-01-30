@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ChatMobileBar from "../components/chat/ChatMobileBar.jsx";
 import ChatSidebar from "../components/chat/ChatSidebar.jsx";
@@ -37,9 +37,20 @@ const Chat = () => {
   const [isSending, setIsSending] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showNewChatModal, setShowNewChatModal] = useState(false);
+  // const [message, setMessage] = useState([
+  //   {
+  //     role: "user",
+  //     content: "Hello, I need help with my account.",
+  //   },
+  //   {
+  //     role: "ai",
+  //     content: "  Sure, I can help you with that. What seems to be the issue?",
+  //   },
+  // ]);
 
   // socket state
   const [Socket, setSocket] = useState(null);
+  const socketRef = useRef(null);
 
   // Initialize with first chat if none exists
   useEffect(() => {
@@ -53,8 +64,28 @@ const Chat = () => {
       withCredentials: true,
     });
 
+    socketRef.current = newSocket;
+
     newSocket.on("connect", () => {
       console.log("Connected to WebSocket server");
+    });
+
+    //  Handle incoming AI responses
+    newSocket.on("ai-response", (message) => {
+      console.log("Received AI response:", message);
+      try {
+        dispatch(addMessage({ role: "ai", content: message.content }));
+      } catch (error) {
+        dispatch(
+          addMessage({
+            role: "ai",
+            content: "Error fetching AI response.",
+            error: true,
+          }),
+        );
+      } finally {
+        setIsSending(false);
+      }
     });
 
     newSocket.on("disconnect", () => {
@@ -91,6 +122,7 @@ const Chat = () => {
   const sendMessage = useCallback(async () => {
     const trimmed = input.trim();
     if (!trimmed || !activeChatId || isSending) return;
+    console.log("Sending message:", trimmed);
 
     setIsSending(true);
 
@@ -98,22 +130,11 @@ const Chat = () => {
     dispatch(addMessage({ role: "user", content: trimmed }));
     setInput("");
 
-    try {
-      const reply = await fakeAIReply(trimmed);
-      // Add AI message to Redux
-      dispatch(addMessage({ role: "ai", content: reply }));
-    } catch {
-      // Add error message to Redux
-      dispatch(
-        addMessage({
-          role: "ai",
-          content: "Error fetching AI response.",
-          error: true,
-        }),
-      );
-    } finally {
-      setIsSending(false);
-    }
+    // send user message via socket
+    Socket.emit("ai-message", {
+      chat: activeChatId,
+      content: trimmed,
+    });
   }, [input, activeChatId, isSending, dispatch]);
 
   return (
