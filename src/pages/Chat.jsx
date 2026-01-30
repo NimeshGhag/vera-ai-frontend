@@ -21,6 +21,7 @@ import {
   selectCurrentChatMessages,
 } from "../redux/selectors/chatSelectors";
 import axios from "../api/axios";
+import { io } from "socket.io-client";
 
 const Chat = () => {
   const dispatch = useDispatch();
@@ -37,11 +38,37 @@ const Chat = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showNewChatModal, setShowNewChatModal] = useState(false);
 
+  // socket state
+  const [Socket, setSocket] = useState(null);
+
   // Initialize with first chat if none exists
   useEffect(() => {
-    const response = axios.get("/chat/", { withCredentials: true }).then((response) => {
-      dispatch(setChats(response.data));
+    const response = axios
+      .get("/chat/", { withCredentials: true })
+      .then((response) => {
+        dispatch(setChats(response.data));
+      });
+
+    const newSocket = io("http://localhost:3000", {
+      withCredentials: true,
     });
+
+    newSocket.on("connect", () => {
+      console.log("Connected to WebSocket server");
+    });
+
+    newSocket.on("disconnect", () => {
+      console.log("Socket Server disconnected");
+    });
+
+    setSocket(newSocket);
+
+    // Cleanup function to disconnect socket on component unmount
+    return () => {
+      if (newSocket) {
+        newSocket.disconnect();
+      }
+    };
   }, [dispatch]);
 
   const startNewChat = useCallback(() => {
@@ -72,7 +99,7 @@ const Chat = () => {
     setInput("");
 
     try {
-      // const reply = await fakeAIReply(trimmed);
+      const reply = await fakeAIReply(trimmed);
       // Add AI message to Redux
       dispatch(addMessage({ role: "ai", content: reply }));
     } catch {
@@ -104,6 +131,7 @@ const Chat = () => {
         }}
         onNewChat={startNewChat}
         open={sidebarOpen}
+        socket={Socket}
       />
       <main className="chat-main" role="main">
         {messages.length === 0 && (

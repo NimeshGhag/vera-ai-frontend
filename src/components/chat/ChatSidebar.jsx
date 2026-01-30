@@ -10,11 +10,16 @@ const ChatSidebar = ({
   onSelectChat,
   onNewChat,
   open,
+  socket,
 }) => {
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const doLogout = () => {
+    // Disconnect socket before logout
+    if (socket) {
+      socket.disconnect();
+    }
     try {
       // Clear all cookies for current domain (best-effort)
       document.cookie.split(";").forEach(function (c) {
