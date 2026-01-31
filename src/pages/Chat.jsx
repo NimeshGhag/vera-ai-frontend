@@ -58,6 +58,11 @@ const Chat = () => {
       .get("/chat/", { withCredentials: true })
       .then((response) => {
         dispatch(setChats(response.data));
+        // Set the first chat as active
+        if (response.data.length > 0) {
+          const firstChatId = response.data[0].id || response.data[0]._id;
+          dispatch(setCurrentChat(firstChatId));
+        }
       });
 
     const newSocket = io("http://localhost:3000", {
@@ -72,7 +77,6 @@ const Chat = () => {
 
     //  Handle incoming AI responses
     newSocket.on("ai-response", (message) => {
-      console.log("Received AI response:", message);
       try {
         dispatch(addMessage({ role: "ai", content: message.content }));
       } catch (error) {
@@ -122,7 +126,6 @@ const Chat = () => {
   const sendMessage = useCallback(async () => {
     const trimmed = input.trim();
     if (!trimmed || !activeChatId || isSending) return;
-    console.log("Sending message:", trimmed);
 
     setIsSending(true);
 
@@ -135,7 +138,31 @@ const Chat = () => {
       chat: activeChatId,
       content: trimmed,
     });
-  }, [input, activeChatId, isSending, dispatch]);
+  }, [input, activeChatId, isSending, dispatch, Socket]);
+
+  const getmessages = useCallback(
+    async (chatId) => {
+      if (!chatId) {
+        console.warn("No chatId provided to getmessages");
+        return;
+      }
+      const response = await axios.get(`/chat/messages/${chatId}`, {
+        withCredentials: true,
+      });
+
+
+      // Dispatch each message individually
+      response.data.messages.map((msg) =>
+        dispatch(
+          addMessage({
+            role: msg.role === "user" ? "user" : "ai",
+            content: msg.content,
+          }),
+        ),
+      );
+    },
+    [dispatch],
+  );
 
   return (
     <div className="chat-layout minimal">
@@ -148,8 +175,10 @@ const Chat = () => {
         activeChatId={activeChatId}
         onSelectChat={(id) => {
           dispatch(setCurrentChat(id));
+          getmessages(id);
           setSidebarOpen(false);
         }}
+        // getmessages={getmessages}
         onNewChat={startNewChat}
         open={sidebarOpen}
         socket={Socket}
