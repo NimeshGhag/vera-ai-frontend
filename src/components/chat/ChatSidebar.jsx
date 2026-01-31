@@ -3,6 +3,7 @@ import "./ChatSidebar.css";
 import ConfirmModal from "../ui/ConfirmModal";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "../../api/axios";
 
 const ChatSidebar = ({
   chats,
@@ -15,18 +16,26 @@ const ChatSidebar = ({
   const navigate = useNavigate();
   const [confirmOpen, setConfirmOpen] = useState(false);
 
-  const doLogout = () => {
+  const doLogout = async () => {
     // Disconnect socket before logout
     if (socket) {
       socket.disconnect();
     }
     try {
+      // Call logout endpoint
+      await axios.post("/auth/logout", {}, { withCredentials: true });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+    try {
       // Clear all cookies for current domain (best-effort)
       document.cookie.split(";").forEach(function (c) {
         const name = c.split("=")[0].trim();
-        document.cookie = name + "=; Max-Age=0; path=/";
-        document.cookie =
-          name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+        if (name) {
+          document.cookie = name + "=; Max-Age=0; path=/";
+          document.cookie =
+            name + "=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+        }
       });
     } catch (e) {}
     try {
